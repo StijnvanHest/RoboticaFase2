@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="get_products">
+
+	<executable package_path="ariac_flexbe_behaviors.get_products_sm" class="get_productsSM" />
+	<tagstring></tagstring>
+	<author>Gerard Harkema</author>
+	<date>Sun Apr 19 2020</date>
+	<description>
+		Getting all the products from a product list
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

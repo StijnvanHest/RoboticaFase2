@@ -42,7 +42,7 @@ from osrf_gear.srv import GetMaterialLocations
 
 class GetMaterialLocationsState(EventState):
 	'''
-	Gets the order for a shipment
+	Gets the location of a specific part
 	># part			string  	Part
 	#> material_locations	StorageUnit[]	Material Locations	
 	<= continue 		Given order passed.

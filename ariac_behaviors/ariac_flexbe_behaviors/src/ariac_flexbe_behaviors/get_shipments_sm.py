@@ -26,6 +26,8 @@ Created on Sun Apr 19 2020
 class get_shipmentsSM(Behavior):
 	'''
 	Tests the starting and stopping of the assignment
+
+This example is a part of the order example.
 	'''
 
 

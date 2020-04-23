@@ -25,7 +25,9 @@ Created on Sun Apr 19 2020
 '''
 class get_productsSM(Behavior):
 	'''
-	Getting all the products from a product list
+	Getting all the products from a product list.
+
+This example is a part of the order example.
 	'''
 
 

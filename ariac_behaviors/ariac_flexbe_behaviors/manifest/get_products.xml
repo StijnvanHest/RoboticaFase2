@@ -7,7 +7,9 @@
 	<author>Gerard Harkema</author>
 	<date>Sun Apr 19 2020</date>
 	<description>
-		Getting all the products from a product list
+		Getting all the products from a product list.
+
+This example is a part of the order example.
 	</description>
 
 

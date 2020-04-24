@@ -14,6 +14,7 @@ from ariac_flexbe_states.compute_grasp_state import ComputeGraspState
 from ariac_flexbe_states.message_state import MessageState
 from ariac_flexbe_states.moveit_to_joints_dyn_ariac_state import MoveitToJointsDynAriacState
 from flexbe_states.wait_state import WaitState
+from ariac_flexbe_states.get_object_pose import GetObjectPoseState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -52,12 +53,13 @@ class ariac_exampleSM(Behavior):
 		move_group = 'manipulator'
 		gripper = 'arm1_vacuum_gripper_link'
 		move_goup_prefix = '/ariac/arm1'
-		# x:859 y:433, x:331 y:369
+		# x:26 y:462, x:331 y:369
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 		_state_machine.userdata.part_pose = []
 		_state_machine.userdata.joint_values = []
 		_state_machine.userdata.joint_names = []
 		_state_machine.userdata.part = 'gasket_part'
+		_state_machine.userdata.offset = 0.1
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -75,14 +77,14 @@ class ariac_exampleSM(Behavior):
 
 			# x:187 y:22
 			OperatableStateMachine.add('DetectCameraPart',
-										DetectPartCameraState(ref_frame='world', camera_topic='/ariac/logical_camera_1', camera_frame='logical_camera_1_frame', time_out=5.0),
+										DetectPartCameraState(ref_frame='arm1_linear_arm_actuator', camera_topic='/ariac/logical_camera_1', camera_frame='logical_camera_1_frame', time_out=5.0),
 										transitions={'continue': 'PartPoseMessage', 'failed': 'failed', 'not_found': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'not_found': Autonomy.Off},
 										remapping={'part': 'part', 'pose': 'part_pose'})
 
 			# x:638 y:24
 			OperatableStateMachine.add('ComputePick',
-										ComputeGraspState(move_group=move_group, move_group_prefix=move_goup_prefix, offset=0.0, joint_names=names, tool_link='ee_link', rotation=0),
+										ComputeGraspState(move_group=move_group, move_group_prefix=move_goup_prefix, offset=0.03, joint_names=names, tool_link='ee_link', rotation=0),
 										transitions={'continue': 'JointValuesMessage', 'failed': 'failed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'pose': 'part_pose', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
@@ -118,7 +120,7 @@ class ariac_exampleSM(Behavior):
 			# x:802 y:337
 			OperatableStateMachine.add('MoveR1PreGrasp2',
 										ariac_flexbe_states__SrdfStateToMoveit(config_name='bin3PreGrasp', move_group=move_group, move_group_prefix=move_goup_prefix, action_topic='/move_group', robot_name=''),
-										transitions={'reached': 'finished', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
+										transitions={'reached': 'GetAgvPose', 'planning_failed': 'failed', 'control_failed': 'failed', 'param_error': 'failed'},
 										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off, 'param_error': Autonomy.Off},
 										remapping={'config_name': 'config_name', 'move_group': 'move_group', 'robot_name': 'robot_name', 'action_topic': 'action_topic', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
 
@@ -134,6 +136,41 @@ class ariac_exampleSM(Behavior):
 										transitions={'continue': 'MoveR1PreGrasp1'},
 										autonomy={'continue': Autonomy.Off},
 										remapping={'message': 'part_pose'})
+
+			# x:634 y:493
+			OperatableStateMachine.add('ComputeDrop',
+										ComputeGraspState(move_group=move_group, move_group_prefix=move_goup_prefix, offset=0.03, joint_names=names, tool_link='ee_link', rotation=0),
+										transitions={'continue': 'JointValuesMessage_2', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'pose': 'part_pose', 'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+
+			# x:463 y:490
+			OperatableStateMachine.add('JointValuesMessage_2',
+										MessageState(),
+										transitions={'continue': 'JointNamesValues_2'},
+										autonomy={'continue': Autonomy.Off},
+										remapping={'message': 'joint_values'})
+
+			# x:297 y:493
+			OperatableStateMachine.add('JointNamesValues_2',
+										MessageState(),
+										transitions={'continue': 'MoveR1ToDrop'},
+										autonomy={'continue': Autonomy.Off},
+										remapping={'message': 'joint_names'})
+
+			# x:101 y:493
+			OperatableStateMachine.add('MoveR1ToDrop',
+										MoveitToJointsDynAriacState(move_group_prefix=move_goup_prefix, move_group=move_group, action_topic='/move_group'),
+										transitions={'reached': 'finished', 'planning_failed': 'failed', 'control_failed': 'failed'},
+										autonomy={'reached': Autonomy.Off, 'planning_failed': Autonomy.Off, 'control_failed': Autonomy.Off},
+										remapping={'joint_values': 'joint_values', 'joint_names': 'joint_names'})
+
+			# x:798 y:492
+			OperatableStateMachine.add('GetAgvPose',
+										GetObjectPoseState(object_frame='kit_tray_1', ref_frame='arm1_linear_arm_actuator', time_out=5.0),
+										transitions={'continue': 'ComputeDrop', 'time_out': 'failed', 'failed': 'failed'},
+										autonomy={'continue': Autonomy.Off, 'time_out': Autonomy.Off, 'failed': Autonomy.Off},
+										remapping={'pose': 'pose'})
 
 
 		return _state_machine

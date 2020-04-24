@@ -3,7 +3,7 @@
 <behavior name="get_order">
 
 	<executable package_path="ariac_flexbe_behaviors.get_order_sm" class="get_orderSM" />
-	<tagstring></tagstring>
+	<tagstring>logistic</tagstring>
 	<author>Gerard Harkema</author>
 	<date>Sun Apr 19 2020</date>
 	<description>

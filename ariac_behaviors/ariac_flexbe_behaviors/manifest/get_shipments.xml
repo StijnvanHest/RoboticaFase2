@@ -3,7 +3,7 @@
 <behavior name="get_shipments">
 
 	<executable package_path="ariac_flexbe_behaviors.get_shipments_sm" class="get_shipmentsSM" />
-	<tagstring></tagstring>
+	<tagstring>logistic</tagstring>
 	<author>Gerard Harkema</author>
 	<date>Sun Apr 19 2020</date>
 	<description>

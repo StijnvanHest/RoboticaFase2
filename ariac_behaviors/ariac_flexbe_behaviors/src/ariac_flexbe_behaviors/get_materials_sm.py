@@ -8,8 +8,10 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
-from ariac_numeric_flexbe_states.add_numeric_state import AddNumericState
+from ariac_flexbe_states.start_assignment_state import StartAssignment
 from ariac_flexbe_states.message_state import MessageState
+from ariac_flexbe_states.end_assignment_state import EndAssignment
+from ariac_logistics_flexbe_states.get_material_locations import GetMaterialLocationsState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -17,18 +19,18 @@ from ariac_flexbe_states.message_state import MessageState
 
 
 '''
-Created on Tue Apr 21 2020
-@author: Gerard harkema
+Created on Thu Apr 23 2020
+@author: Gerard Harkema
 '''
-class numeric_testsSM(Behavior):
+class get_materialsSM(Behavior):
 	'''
-	Test new numeric functions
+	Demo to get materail locations of a specific part
 	'''
 
 
 	def __init__(self):
-		super(numeric_testsSM, self).__init__()
-		self.name = 'numeric_tests'
+		super(get_materialsSM, self).__init__()
+		self.name = 'get_materials'
 
 		# parameters of this behavior
 
@@ -44,11 +46,10 @@ class numeric_testsSM(Behavior):
 
 
 	def create(self):
-		# x:30 y:365
+		# x:705 y:41
 		_state_machine = OperatableStateMachine(outcomes=['finished'])
-		_state_machine.userdata.GetalA = 10
-		_state_machine.userdata.GetalB = 5
-		_state_machine.userdata.GetalC = 0
+		_state_machine.userdata.MaterialLocations = []
+		_state_machine.userdata.Part = 'piston_rod_part'
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -57,19 +58,31 @@ class numeric_testsSM(Behavior):
 
 
 		with _state_machine:
-			# x:30 y:40
-			OperatableStateMachine.add('Add',
-										AddNumericState(),
-										transitions={'done': 'Result'},
-										autonomy={'done': Autonomy.Off},
-										remapping={'value_a': 'GetalA', 'value_b': 'GetalB', 'result': 'GetalC'})
+			# x:34 y:25
+			OperatableStateMachine.add('StartAssignment',
+										StartAssignment(),
+										transitions={'continue': 'GetMaterialsLocations'},
+										autonomy={'continue': Autonomy.Off})
 
-			# x:211 y:41
-			OperatableStateMachine.add('Result',
+			# x:362 y:28
+			OperatableStateMachine.add('MaterialsLocationMessage',
 										MessageState(),
-										transitions={'continue': 'finished'},
+										transitions={'continue': 'EndAssignment'},
 										autonomy={'continue': Autonomy.Off},
-										remapping={'message': 'GetalC'})
+										remapping={'message': 'MaterialLocations'})
+
+			# x:541 y:29
+			OperatableStateMachine.add('EndAssignment',
+										EndAssignment(),
+										transitions={'continue': 'finished'},
+										autonomy={'continue': Autonomy.Off})
+
+			# x:176 y:26
+			OperatableStateMachine.add('GetMaterialsLocations',
+										GetMaterialLocationsState(),
+										transitions={'continue': 'MaterialsLocationMessage'},
+										autonomy={'continue': Autonomy.Off},
+										remapping={'part': 'Part', 'material_locations': 'MaterialLocations'})
 
 
 		return _state_machine

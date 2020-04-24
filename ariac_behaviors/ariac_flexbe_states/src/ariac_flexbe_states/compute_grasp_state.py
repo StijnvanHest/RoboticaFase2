@@ -105,10 +105,9 @@ class ComputeGraspState(EventState):
 
 		
 
-		#remove GAH self._robot1_client = actionlib.SimpleActionClient('execute_trajectory',
-		#	moveit_msgs.msg.ExecuteTrajectoryAction)
-		#remove GAH self._robot1_client.wait_for_server()
-		#remove RAH rospy.loginfo('Execute Trajectory server is available for robot1')
+		self._robot1_client = actionlib.SimpleActionClient(move_group_prefix + '/execute_trajectory', moveit_msgs.msg.ExecuteTrajectoryAction)
+		self._robot1_client.wait_for_server()
+		rospy.loginfo('Execute Trajectory server is available for robot1')
 
 	def execute(self, userdata):
 		# This method is called periodically while the state is active.
@@ -158,7 +157,8 @@ class ComputeGraspState(EventState):
 
 		#q_orig = [target_pose.pose.orientation.x, target_pose.pose.orientation.y, target_pose.pose.orientation.z, target_pose.pose.orientation.w]
 		q_orig = [0, 0, 0, 1]
-		q_rot = quaternion_from_euler(self._rotation, 0, 0)
+		#q_rot = quaternion_from_euler(self._rotation, 0, 0)
+		q_rot = quaternion_from_euler(self._rotation, math.pi/2.0, 0) # math.pi/2.0 added by gerard!!
 		#q_rot = quaternion_from_euler(math.pi/-2.0, 0, 0)
 		res_q = quaternion_multiply(q_rot, q_orig)
 		target_pose.pose.orientation = geometry_msgs.msg.Quaternion(*res_q)

@@ -2,7 +2,7 @@
 
 # Software License Agreement (BSD License)
 #
-# Copyright (c) 2018, Delft University of Technology
+# Copyright (c) 2020, Avans Hogeschool
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -15,7 +15,7 @@
 #    copyright notice, this list of conditions and the following
 #    disclaimer in the documentation and/or other materials provided
 #    with the distribution.
-#  * Neither the name of Delft University of Technology nor the names of its
+#  * Neither the name of Avans Hogeschool nor the names of its
 #    contributors may be used to endorse or promote products derived
 #    from this software without specific prior written permission.
 #
@@ -32,7 +32,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# Authors: the HRWROS mooc instructors
+# Authors: Gerard Harkema
+
 
 import rospy
 import rostopic
@@ -54,28 +55,26 @@ Created on Sep 5 2018
 
 '''
 
-class DetectPartCameraState(EventState):
+class GetObjectPoseState(EventState):
 	'''
-	State to detect the pose of the part with any of the cameras in the factory simulation of the Ariac
+	State to detect the pose of a object
+
+  	-- object_frame		string		the topic name for the camera to detect the part
 	-- ref_frame		string		reference frame for the part pose output key
-  	-- camera_topic		string		the topic name for the camera to detect the part
-	-- camera_frame 	string		frame of the camera
 	-- time_out		float		Time with the camera to have detected the part
-	<# part			string		Part to detect
 	#> pose			PoseStamped	Pose of the detected part
 
-	<= continue 				if the pose of the part has been succesfully obtained
-	<= failed 				otherwise
+	<= continue 				if the pose of the object has been succesfully obtained
+	<= time_out 				a timeout
 
+	<= failed 				otherwise
 	'''
 
-	def __init__(self, ref_frame, camera_topic, camera_frame, time_out = 5.0):
+	def __init__(self, object_frame, ref_frame, time_out = 5.0):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(DetectPartCameraState, self).__init__(outcomes = ['continue', 'failed', 'not_found'], input_keys = ['part'], output_keys = ['pose'])
+		super(GetObjectPoseState, self).__init__(outcomes = ['continue', 'time_out', 'failed'], output_keys = ['pose'])
 		self.ref_frame = ref_frame
-		self._topic = camera_topic
-		self._camera_frame = camera_frame
-		self._connected = False
+		self._object_frame = object_frame
 		self._failed = False
 
 		# Store state parameter for later use.
@@ -84,49 +83,44 @@ class DetectPartCameraState(EventState):
 		self._start_time = None
 
 
-
 		# tf to transfor the object pose
 		self._tf_buffer = tf2_ros.Buffer(rospy.Duration(10.0)) #tf buffer length
 		self._tf_listener = tf2_ros.TransformListener(self._tf_buffer)
-
-		# Subscribe to the topic for the logical camera
-		(msg_path, msg_topic, fn) = rostopic.get_topic_type(self._topic)
-
-		if msg_topic == self._topic:
-			msg_type = self._get_msg_from_path(msg_path)
-			self._sub = ProxySubscriberCached({self._topic: msg_type})
-			self._connected = True
-		else:
-			Logger.logwarn('Topic %s for state %s not yet available.\nFound: %s\nWill try again when entering the state...' % (self._topic, self.name, str(msg_topic)))
-
 
 	def execute(self, userdata):
 		# This method is called periodically while the state is active.
 		# Main purpose is to check state conditions and trigger a corresponding outcome.
 		# If no outcome is returned, the state will stay active.
-		if not self._connected:
-			userdata.pose = None
-			return 'failed'
 
+		rospy.loginfo('done2')
 		if self._failed:
 			userdata.pose = None
 			return 'failed'
 
 		if rospy.Time.now() - self._start_time > self._time_out:
-			return 'not_found' # One of the outcomes declared above.
+			return 'time_out' # One of the outcomes declared above.
 
-		if self._sub.has_msg(self._topic):
-			message = self._sub.get_last_msg(self._topic)
-			for model in message.models:
-				if model.type == userdata.part:
-					pose = PoseStamped()
-					pose.pose = model.pose
-					pose.header.frame_id = self._camera_frame
-					pose.header.stamp = rospy.Time.now()
-					# Transform the pose to desired output frame
-					pose = tf2_geometry_msgs.do_transform_pose(pose, self._transform)
-					userdata.pose = pose
-					return 'continue'
+		rospy.loginfo('done3')
+		pose = PoseStamped()
+		pose.pose = self._object_frame
+		pose.header.frame_id = 'world'
+		pose.header.stamp = rospy.Time.now()
+		rospy.loginfo('done4')
+		# Transform the pose to desired output frame
+		pose = tf2_geometry_msgs.do_transform_pose(pose, self._transform)
+		rospy.loginfo('done5')
+		userdata.pose = pose
+		return 'continue'
+
+
+'''
+transform = tf_buffer.lookup_transform(target_frame,
+                                       pose_stamped_to_transform.header.frame_id, #source frame
+                                       rospy.Time(0), #get the tf at first available time
+                                       rospy.Duration(1.0)) #wait for 1 second
+
+pose_transformed = tf2_geometry_msgs.do_transform_pose(pose_stamped, transform)
+'''
 
 	def on_enter(self, userdata):
 		# This method is called when the state becomes active, i.e. a transition from another state to this one is taken.
@@ -138,9 +132,10 @@ class DetectPartCameraState(EventState):
 			Logger.loginfo('Need to wait for %.1f seconds.' % time_to_wait)
 
 
-		# Get transform between camera and robot1_base
+		# Get transform between world and robot_base
 		try:
-			self._transform = self._tf_buffer.lookup_transform(self.ref_frame, self._camera_frame, rospy.Time(0), rospy.Duration(1.0))
+			self._transform = self._tf_buffer.lookup_transform(self.ref_frame, 'world', rospy.Time(0), rospy.Duration(1.0))
+			rospy.loginfo('done1')
 		except Exception as e:
 			Logger.logwarn('Could not transform pose: ' + str(e))
 		 	self._failed = True

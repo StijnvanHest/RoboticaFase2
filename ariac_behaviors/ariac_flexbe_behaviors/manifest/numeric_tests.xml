@@ -3,7 +3,7 @@
 <behavior name="numeric_tests">
 
 	<executable package_path="ariac_flexbe_behaviors.numeric_tests_sm" class="numeric_testsSM" />
-	<tagstring>Arica</tagstring>
+	<tagstring>numeric</tagstring>
 	<author>Gerard harkema</author>
 	<date>Tue Apr 21 2020</date>
 	<description>

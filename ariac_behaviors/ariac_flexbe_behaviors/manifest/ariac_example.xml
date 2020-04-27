@@ -3,7 +3,7 @@
 <behavior name="ariac_example">
 
 	<executable package_path="ariac_flexbe_behaviors.ariac_example_sm" class="ariac_exampleSM" />
-	<tagstring>ariac</tagstring>
+	<tagstring>ariac, example</tagstring>
 	<author>Gerard Harkema</author>
 	<date>Thu Apr 16 2020</date>
 	<description>

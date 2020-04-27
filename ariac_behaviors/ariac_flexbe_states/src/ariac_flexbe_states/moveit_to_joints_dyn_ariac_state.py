@@ -17,11 +17,11 @@ class MoveitToJointsDynAriacState(EventState):
 	'''
 	Uses MoveIt to plan and move the specified joints to the target configuration.
 
-	-- move_group		string		Name of the move group to be used for planning.
+	># move_group		string		Name of the move group to be used for planning.
 
-	-- move_group_prefix	string		Name of the prefix of the move group to be used for planning.
+	># move_group_prefix	string		Name of the prefix of the move group to be used for planning.
 									Specified joint names need to exist in the given group.
-	-- action_topic 	string 		Topic on which MoveIt is listening for action calls.
+	># action_topic 	string 		Topic on which MoveIt is listening for action calls.
 
 	># joint_names		string[]	Names of the joints to set.
 									Does not need to specify all joints.
@@ -35,19 +35,14 @@ class MoveitToJointsDynAriacState(EventState):
 	'''
 
 
-	def __init__(self, move_group_prefix, move_group, action_topic = '/move_group'):
+	def __init__(self):
 		'''
 		Constructor
 		'''
 		super(MoveitToJointsDynAriacState, self).__init__(
 			outcomes=['reached', 'planning_failed', 'control_failed'],
-			input_keys=['joint_values', 'joint_names'])
+			input_keys=['move_group_prefix', 'move_group', 'action_topic', 'joint_values', 'joint_names'])
 		
-		self._action_topic = move_group_prefix + action_topic
-		self._client = ProxyActionClient({self._action_topic: MoveGroupAction})
-
-		self._move_group = move_group
-		self._joint_names = None
 
 		self._planning_failed = False
 		self._control_failed = False
@@ -85,6 +80,13 @@ class MoveitToJointsDynAriacState(EventState):
 		self._planning_failed = False
 		self._control_failed = False
 		self._success = False
+
+		self._action_topic = userdata.move_group_prefix + userdata.action_topic
+		self._client = ProxyActionClient({self._action_topic: MoveGroupAction})
+
+		self._move_group = userdata.move_group
+		self._joint_names = None
+
 
 		self._joint_names = userdata.joint_names
 

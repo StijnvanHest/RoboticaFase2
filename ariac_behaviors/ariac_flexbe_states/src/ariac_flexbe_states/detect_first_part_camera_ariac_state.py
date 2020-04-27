@@ -55,14 +55,15 @@ Created on Sep 5 2018
 
 '''
 
-class DetectPartCameraAriacState(EventState):
+class DetectFirstPartCameraAriacState(EventState):
 	'''
 	State to detect the pose of the part with any of the cameras in the factory simulation of the Ariac
 	-- time_out		float		Time in withs the camera to have detected the part
+	-- part_list		string[]	List of parts to detect
 	># ref_frame		string		reference frame for the part pose output key
   	># camera_topic		string		the topic name for the camera to detect the part
 	># camera_frame 	string		frame of the camera
-	># part			string		Part to detect
+	#> part			string		Detect part
 	#> pose			PoseStamped	Pose of the detected part
 
 	<= continue 				if the pose of the part has been succesfully obtained
@@ -70,12 +71,13 @@ class DetectPartCameraAriacState(EventState):
 
 	'''
 
-	def __init__(self, time_out = 0.5):
+	def __init__(self, part_list, time_out = 0.5):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(DetectPartCameraAriacState, self).__init__(outcomes = ['continue', 'failed', 'not_found'], input_keys = ['ref_frame', 'camera_topic', 'camera_frame', 'part'], output_keys = ['pose'])
+		super(DetectFirstPartCameraAriacState, self).__init__(outcomes = ['continue', 'failed', 'not_found'], input_keys = ['ref_frame', 'camera_topic', 'camera_frame'], output_keys = ['part', 'pose'])
 
 		# Store state parameter for later use.
 		self._wait = time_out
+		self._part_list = part_list
 
 		# tf to transfor the object pose
 		self._tf_buffer = tf2_ros.Buffer(rospy.Duration(10.0)) #tf buffer length
@@ -88,10 +90,12 @@ class DetectPartCameraAriacState(EventState):
 		# If no outcome is returned, the state will stay active.
 		if not self._connected:
 			userdata.pose = None
+			userdata.part = None
 			return 'failed'
 
 		if self._failed:
 			userdata.pose = None
+			userdata.part = None
 			return 'failed'
 
 		elapsed = rospy.get_rostime() - self._start_time;
@@ -100,16 +104,19 @@ class DetectPartCameraAriacState(EventState):
 		if self._sub.has_msg(self._topic):
 			message = self._sub.get_last_msg(self._topic)
 			for model in message.models:
-				if model.type == userdata.part:
-					pose = PoseStamped()
-					pose.pose = model.pose
-					pose.header.frame_id = self._camera_frame
-					pose.header.stamp = rospy.Time.now()
-					# Transform the pose to desired output frame
-					pose = tf2_geometry_msgs.do_transform_pose(pose, self._transform)
-					userdata.pose = pose
-					return 'continue'
+				for part in self._part_list:
+					if model.type == part:
+						pose = PoseStamped()
+						pose.pose = model.pose
+						pose.header.frame_id = self._camera_frame
+						pose.header.stamp = rospy.Time.now()
+						# Transform the pose to desired output frame
+						pose = tf2_geometry_msgs.do_transform_pose(pose, self._transform)
+						userdata.pose = pose
+						userdata.part = part
+						return 'continue'
 			userdata.pose = None
+			userdata.part = None
 			return 'failed'
 
 	def on_enter(self, userdata):

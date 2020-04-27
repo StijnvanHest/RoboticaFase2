@@ -9,8 +9,8 @@
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from ariac_logistics_flexbe_states.get_products_from_shipment_state import GetProductsFromShipmentState
-from ariac_numeric_flexbe_states.add_numeric_state import AddNumericState
-from ariac_numeric_flexbe_states.equal_numeric_state import EqualNumericState
+from ariac_support_flexbe_states.add_numeric_state import AddNumericState
+from ariac_support_flexbe_states.equal_state import EqualState
 from ariac_flexbe_behaviors.get_products_sm import get_productsSM
 from ariac_flexbe_states.message_state import MessageState
 # Additional imports can be added inside the following tags
@@ -85,7 +85,7 @@ This example is a part of the order example.
 
 			# x:740 y:120
 			OperatableStateMachine.add('CompareShepmentsIterator',
-										EqualNumericState(),
+										EqualState(),
 										transitions={'true': 'finished', 'false': 'GetProducts'},
 										autonomy={'true': Autonomy.Off, 'false': Autonomy.Off},
 										remapping={'value_a': 'ShipmentIterator', 'value_b': 'NumberOfShipments'})

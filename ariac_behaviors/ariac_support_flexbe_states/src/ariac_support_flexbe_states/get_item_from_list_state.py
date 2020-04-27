@@ -41,29 +41,30 @@ from flexbe_core import EventState, Logger
 from std_srvs.srv import Trigger
 from osrf_gear.msg import Order
 
-class CopyNumericState(EventState):
+class GetItemFromListState(EventState):
 	'''
-	Copies value to result
+	ReplaceNumericState gets a item from a list
 
-	<# value	float32	Value A	
+	># list		object[]	List	
+	># index	Int16		Index of the item
 
-	#> result	float32	result	
-	<= done			Given calculation done.
-
-
+	#> item		object		Item	
+	<= done				Given replacement done.
+	<= invalid_index		Invalid index
 	'''
 
 	def __init__(self):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(CopyNumericState, self).__init__(outcomes = ['done'], input_keys = ['value'],output_keys = ['result'])
+		super(GetItemFromListState, self).__init__(outcomes = ['done', 'invalid_index'], input_keys = ['list', 'index'],output_keys = ['item'])
 
 
 	def execute(self, userdata):
 		# This method is called periodically while the state is active.
 		# Main purpose is to check state conditions and trigger a corresponding outcome.
 		# If no outcome is returned, the state will stay active.
-     		userdata.result = userdata.value
-
+		if  userdata.index >= len(userdata.list):
+			return 'invalid_index'
+		userdata.item = userdata.list[userdata.index]
 		return 'done'
 
 	def on_enter(self, userdata):

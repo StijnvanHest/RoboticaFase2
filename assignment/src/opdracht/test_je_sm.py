@@ -8,8 +8,7 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
-from ariac_support_flexbe_states.add_numeric_state import AddNumericState
-from ariac_flexbe_states.message_state import MessageState
+from flexbe_states.wait_state import WaitState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -17,18 +16,18 @@ from ariac_flexbe_states.message_state import MessageState
 
 
 '''
-Created on Tue Apr 21 2020
-@author: Gerard harkema
+Created on Mon Apr 27 2020
+@author: fdsf
 '''
-class numeric_testsSM(Behavior):
+class test_jeSM(Behavior):
 	'''
-	Test new numeric functions
+	fdsfs
 	'''
 
 
 	def __init__(self):
-		super(numeric_testsSM, self).__init__()
-		self.name = 'numeric_tests'
+		super(test_jeSM, self).__init__()
+		self.name = 'test_je'
 
 		# parameters of this behavior
 
@@ -44,11 +43,8 @@ class numeric_testsSM(Behavior):
 
 
 	def create(self):
-		# x:30 y:365
-		_state_machine = OperatableStateMachine(outcomes=['finished'])
-		_state_machine.userdata.GetalA = 10
-		_state_machine.userdata.GetalB = 5
-		_state_machine.userdata.GetalC = 0
+		# x:30 y:365, x:130 y:365
+		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 
 		# Additional creation code can be added inside the following tags
 		# [MANUAL_CREATE]
@@ -58,18 +54,10 @@ class numeric_testsSM(Behavior):
 
 		with _state_machine:
 			# x:30 y:40
-			OperatableStateMachine.add('Add',
-										AddNumericState(),
-										transitions={'done': 'Result'},
-										autonomy={'done': Autonomy.Off},
-										remapping={'value_a': 'GetalA', 'value_b': 'GetalB', 'result': 'GetalC'})
-
-			# x:211 y:41
-			OperatableStateMachine.add('Result',
-										MessageState(),
-										transitions={'continue': 'finished'},
-										autonomy={'continue': Autonomy.Off},
-										remapping={'message': 'GetalC'})
+			OperatableStateMachine.add('test',
+										WaitState(wait_time=5),
+										transitions={'done': 'finished'},
+										autonomy={'done': Autonomy.Off})
 
 
 		return _state_machine

@@ -8,9 +8,9 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
-from ariac_numeric_flexbe_states.add_numeric_state import AddNumericState
+from ariac_support_flexbe_states.add_numeric_state import AddNumericState
 from ariac_flexbe_states.message_state import MessageState
-from ariac_numeric_flexbe_states.greater_numeric_state import GreaterNumericState
+from ariac_support_flexbe_states.greater_numeric_state import GreaterNumericState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 

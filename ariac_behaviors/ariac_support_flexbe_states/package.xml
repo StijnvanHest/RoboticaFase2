@@ -1,8 +1,8 @@
 <package>
-  <name>ariac_numeric_flexbe_states</name>
+  <name>ariac_support_flexbe_states</name>
   <version>1.0.0</version>
   <description>
-     ariac_flexbe_states provides a collection of numeric states.
+     ariac_support_states provides a collection of support states.
   </description>
   <maintainer email="GA.harkema@avans.nl">TODO</maintainer>
   <license>BSD</license>

@@ -37,15 +37,13 @@
 import rospy
 
 from flexbe_core import EventState, Logger
-from std_srvs.srv import Trigger
-from osrf_gear.msg import Order
 
-class EqualNumericState(EventState):
+class EqualState(EventState):
 	'''
-	EqualNumericState compares two numeric values to equal
+	EqualState compares two object values to equal
 
-	<# value_a	float32	Value A	
-	<# value_b	float32	Value B	
+	<# value_a	object	Value A	
+	<# value_b	object	Value B	
 
 	<= true		value_a equals value_b
 	<= false	value_a not equals value_b
@@ -55,7 +53,7 @@ class EqualNumericState(EventState):
 
 	def __init__(self):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(EqualNumericState, self).__init__(outcomes = ['true', 'false'], input_keys = ['value_a', 'value_b' ])
+		super(EqualState, self).__init__(outcomes = ['true', 'false'], input_keys = ['value_a', 'value_b' ])
 
 
 	def execute(self, userdata):

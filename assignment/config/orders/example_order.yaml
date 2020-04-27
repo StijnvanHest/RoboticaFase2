@@ -50,6 +50,14 @@ models_over_bins:
         rpy: [0, 0, 'pi/4']
         num_models_x: 3
         num_models_y: 3
+  bin1:
+    models:
+      disk_part:
+        xyz_start: [0.1, 0.15, 0.0]
+        xyz_end: [0.35, 0.45, 0.0]
+        rpy: [0, 0, 'pi/4']
+        num_models_x: 3
+        num_models_y: 3
 
 belt_models:
   piston_rod_part:

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <launch>
   <!-- Argument to the launch file.-->
-	<arg name="order_config" default="sample_order.yaml"/>
-	<arg name="sensor_config" default="sample_sensor_config.yaml"/>
+	<arg name="order_config" default="assignment_order.yaml"/>
+	<arg name="sensor_config" default="assignment_sensor_config.yaml"/>
 
 	<include file = "$(find ur10_moveit_config)/launch/move_group.launch">
 	 	<arg name = "arm_namespace" value="/ariac/arm1"/>
@@ -13,7 +13,7 @@
 	</include>
 
 	<!-- Start the opdracht-->
-	<node name="osrf_gear" pkg="osrf_gear" type="gear.py" args="-f $(find opdracht)/config/orders/$(arg order_config) $(find opdracht)/config/sensors/$(arg sensor_config) --development-mode --verbose"
+	<node name="osrf_gear" pkg="osrf_gear" type="gear.py" args="-f $(find assignment)/config/orders/$(arg order_config) $(find assignment)/config/sensors/$(arg sensor_config) --development-mode --verbose"
 	output="screen"/>
 
 

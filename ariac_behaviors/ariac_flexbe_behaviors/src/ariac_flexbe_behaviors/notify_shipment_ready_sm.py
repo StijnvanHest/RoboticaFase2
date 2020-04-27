@@ -11,7 +11,7 @@ from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyC
 from flexbe_states.wait_state import WaitState
 from ariac_flexbe_states.notify_shipment_ready_state import NotifyShipmentReadyState
 from ariac_flexbe_states.get_agv_status_state import GetAgvStatusState
-from ariac_numeric_flexbe_states.equal_numeric_state import EqualNumericState
+from ariac_support_flexbe_states.equal_state import EqualState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -79,7 +79,7 @@ This is a part of the ariac_example.
 
 			# x:503 y:161
 			OperatableStateMachine.add('AgvReady',
-										EqualNumericState(),
+										EqualState(),
 										transitions={'true': 'finished', 'false': 'Wait'},
 										autonomy={'true': Autonomy.Off, 'false': Autonomy.Off},
 										remapping={'value_a': 'agv_state', 'value_b': 'agv_ready_state'})

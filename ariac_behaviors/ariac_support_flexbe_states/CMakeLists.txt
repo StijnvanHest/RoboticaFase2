@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ariac_numeric_flexbe_states)
+project(ariac_support_flexbe_states)
 
 find_package(catkin REQUIRED)
 

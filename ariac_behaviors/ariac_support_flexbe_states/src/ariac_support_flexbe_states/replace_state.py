@@ -41,13 +41,13 @@ from flexbe_core import EventState, Logger
 from std_srvs.srv import Trigger
 from osrf_gear.msg import Order
 
-class ReplaceNumericState(EventState):
+class ReplaceState(EventState):
 	'''
 	ReplaceNumericState replaces the value of result
 
-	<# value	float32	Value	
+	<# value	object	Value	
 
-	#> Result	float32	Result	
+	#> Result	object	Result	
 	<= done			Given replacement done.
 
 
@@ -55,7 +55,7 @@ class ReplaceNumericState(EventState):
 
 	def __init__(self):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(ReplaceNumericState, self).__init__(outcomes = ['done'], input_keys = ['value'],output_keys = ['result'])
+		super(ReplaceState, self).__init__(outcomes = ['done'], input_keys = ['value'],output_keys = ['result'])
 
 
 	def execute(self, userdata):

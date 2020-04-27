@@ -69,9 +69,9 @@ class ComputeGraspAriacState(EventState):
 	'''
 	Computes the joint configuration needed to grasp the part given its pose.
 
-	-- offset		float		Some offset
-	-- rotation		float		Rotation?
 	-- joint_names		string[]	Names of the joints
+	># offset		float		Some offset
+	># rotation		float		Rotation?
 	># move_group       	string		Name of the group for which to compute the joint values for grasping.
         ># move_group_prefix    string          Name of the prefix of the move group to be used for planning.
 	># tool_link		string		e.g. "ee_link"
@@ -83,13 +83,11 @@ class ComputeGraspAriacState(EventState):
 	<= failed 				otherwise.
 	'''
 
-	def __init__(self, joint_names, offset, rotation):
+	def __init__(self, joint_names):
 		# Declare outcomes, input_keys, and output_keys by calling the super constructor with the corresponding arguments.
-		super(ComputeGraspAriacState, self).__init__(outcomes = ['continue', 'failed'], input_keys = ['move_group', 'move_group_prefix', 'tool_link','pose'], output_keys = ['joint_values','joint_names'])
+		super(ComputeGraspAriacState, self).__init__(outcomes = ['continue', 'failed'], input_keys = ['move_group', 'move_group_prefix', 'tool_link','pose', 'offset', 'rotation'], output_keys = ['joint_values','joint_names'])
 
-		self._offset = offset
 		self._joint_names = joint_names
-		self._rotation = rotation
 
 
 		# tf to transfor the object pose
@@ -130,6 +128,9 @@ class ComputeGraspAriacState(EventState):
 		self._move_group = userdata.move_group
 		self._move_group_prefix = userdata.move_group_prefix
 		self._tool_link = userdata.tool_link
+
+		self._offset = userdata.offset
+		self._rotation = userdata.rotation
 
 		self._srv_name = userdata.move_group_prefix + '/compute_ik'
 		self._ik_srv = ProxyServiceCaller({self._srv_name: GetPositionIK})

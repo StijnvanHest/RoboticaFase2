@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>opdracht</name>
+  <name>assignment</name>
   <version>0.1.0</version>
-  <description>An example of an ARIAC competitor's package.</description>
-  <maintainer email="william@osrfoundation.org">William Woodall</maintainer>
+  <description>Assignment</description>
+  <maintainer email="GA.Harkema@avans.nl">GerardHarkema</maintainer>
 
   <license>Apache 2.0</license>
 

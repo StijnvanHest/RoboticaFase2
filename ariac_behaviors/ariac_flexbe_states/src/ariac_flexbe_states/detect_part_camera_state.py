@@ -79,11 +79,7 @@ class DetectPartCameraState(EventState):
 		self._failed = False
 
 		# Store state parameter for later use.
-		self._time_out = rospy.Duration(time_out)
-
-		self._start_time = None
-
-
+		self._wait = time_out
 
 		# tf to transfor the object pose
 		self._tf_buffer = tf2_ros.Buffer(rospy.Duration(10.0)) #tf buffer length
@@ -112,9 +108,9 @@ class DetectPartCameraState(EventState):
 			userdata.pose = None
 			return 'failed'
 
-		if rospy.Time.now() - self._start_time > self._time_out:
-			return 'not_found' # One of the outcomes declared above.
-
+		elapsed = rospy.get_rostime() - self._start_time;
+		if (elapsed.to_sec() > self._wait):
+			return 'time_out'
 		if self._sub.has_msg(self._topic):
 			message = self._sub.get_last_msg(self._topic)
 			for model in message.models:
@@ -132,13 +128,9 @@ class DetectPartCameraState(EventState):
 		# This method is called when the state becomes active, i.e. a transition from another state to this one is taken.
 		# It is primarily used to start actions which are associated with this state.
 
-		time_to_wait = (self._time_out - (rospy.Time.now() - self._start_time)).to_sec()
+		self._start_time = rospy.get_rostime()
 
-		if time_to_wait > 0:
-			Logger.loginfo('Need to wait for %.1f seconds.' % time_to_wait)
-
-
-		# Get transform between camera and robot1_base
+		# Get transform between camera and robot_base
 		try:
 			self._transform = self._tf_buffer.lookup_transform(self.ref_frame, self._camera_frame, rospy.Time(0), rospy.Duration(1.0))
 		except Exception as e:

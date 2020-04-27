@@ -107,7 +107,7 @@ class ComputeGraspState(EventState):
 
 		self._robot1_client = actionlib.SimpleActionClient(move_group_prefix + '/execute_trajectory', moveit_msgs.msg.ExecuteTrajectoryAction)
 		self._robot1_client.wait_for_server()
-		rospy.loginfo('Execute Trajectory server is available for robot1')
+		rospy.loginfo('Execute Trajectory server is available for robot')
 
 	def execute(self, userdata):
 		# This method is called periodically while the state is active.
@@ -149,7 +149,7 @@ class ComputeGraspState(EventState):
 				rospy.logerr("ComputeGraspState::on_enter - Failed to transform to world")
 				continue
 
-		# the grasp pose is defined as being located on top of the box
+		# the grasp pose is defined as being located on top of the item
 		target_pose.pose.position.z += self._offset + 0.0
 
 
